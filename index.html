@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chatbot with Video and Amazon Connect</title>
+    <style>
+        /* Add your CSS styles here */
+        #chat-container {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Amazon Connect Streams CCP placeholder -->
+    <div id="ccp"></div>
+
+    <!-- Chatbot and video player section -->
+    <div id="chat-container">
+        <div id="chat-messages"></div>
+        <input type="text" id="user-input" placeholder="Type message...">
+        <button id="send-button">Send</button>
+    </div>
+
+    <video id="video-player" width="360" height="280" controls>
+        <source src="" type="video/mp4">
+    </video>
+
+    
+    <script>
+        // Initialize and bind Amazon Connect CCP to the placeholder
+        (function(w, d, x, id){
+            s=d.createElement('script');
+            s.src='https://dtn7rvxwwlhud.cloudfront.net/amazon-connect-chat-interface-client.js';
+            s.async=1;
+            s.id=id;
+            d.getElementsByTagName('head')[0].appendChild(s);
+            w[x] =  w[x] || function() { (w[x].ac = w[x].ac || []).push(arguments) };
+        })(window, document, 'amazon_connect', '8ee7e8a2-b4e5-4192-850f-15d733f38e41');
+        amazon_connect('styles', { openChat: { color: '#000000', backgroundColor: '#123456'}, closeChat: { color: '#ffffff', backgroundColor: '#123456'} });
+        amazon_connect('snippetId', 'QVFJREFIakZhMVo2ZGZmSXpGSnpJS2lYakthYVBxMmJIU0ZPbnhET3AyalJDV1F3UWdGNG94U3QzenVucTNRbkNGSC9EOTAxQUFBQWJqQnNCZ2txaGtpRzl3MEJCd2FnWHpCZEFnRUFNRmdHQ1NxR1NJYjNEUUVIQVRBZUJnbGdoa2dCWlFNRUFTNHdFUVFNN2sxV01yd1FVY0loQm1kTEFnRVFnQ3R5bGVUUjRzSHFSaEhLTHpRSDE3NlJHd0ZoUUw1bXAwNU9KU016ZVBEWHlIOWJXSWlEOExzanZNWlo6OkxlaytXNzNvVlE5RFR5djZINDJiOUZUM1RqbTZtK3Mxb0p3WjJkcHc1bytTMlU3QklHSUN0cFQ3Y0ZOc1FLbWlabXRYVVoxSzVheGZ6S3d4dWR4MkVWdHQ5YmtaM1huSUtpbGZXeERvQnNnZlBBeHhXNlN5UFZRMUoxVStRbHdWZzdwWFUvM2tpV2RSQnVVTmdXZzREMXBhckZWUUtHTT0=');
+        amazon_connect('supportedMessagingContentTypes', [ 'text/plain', 'text/markdown' ]);
+   
+        // Initialize and bind Amazon Connect CCP to the placeholder
+        connect.core.initCCP(document.getElementById('ccp'), {
+            ccpUrl: 'https://zclapsampletesting.awsapps.com/connect/ccp-v2/',
+            region: 'us-east-1',
+            loginPopup: true,
+            loginPopupAutoClose: true,
+            softphone: {
+                allowFramedSoftphone: true
+            },
+            pageOptions: {
+                enableAudioDeviceSettings: true,
+                enablePhoneTypeSettings: true
+            }
+        });
+    </script>
+    <script>
+
+        // Function to fetch and display the video
+        function fetchVideo(videoId) {
+            // Make a request to your backend API with the videoId
+            fetch(`http://localhost:3000/chat?videoId=${videoId}`)
+                .then(response => response.json())
+                .then(data => {
+                    var videoUrl = data.videoUrl;
+                    document.getElementById('chat-messages').innerHTML += '<div>Bot: Here is your video:</div>';
+                    document.getElementById('video-player').src = videoUrl;
+                    document.getElementById('video-player').play();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+
+        // Add a click event listener to the "Send" button
+        document.getElementById('send-button').addEventListener('click', function() {
+            var userInput = document.getElementById('user-input').value;
+            document.getElementById('chat-messages').innerHTML += '<div>User: ' + userInput + '</div>';
+            
+            // Call the fetchVideo function with user input as videoId
+            fetchVideo(userInput);
+        });
+    
+    </script>
+</body>
+</html>
+
+
